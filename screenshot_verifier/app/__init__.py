@@ -1,0 +1,1 @@
+"""Screenshot verifier service package."""
