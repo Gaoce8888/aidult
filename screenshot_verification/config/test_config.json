@@ -1,0 +1,147 @@
+{
+  "performance_test": {
+    "base_url": "http://localhost:8000",
+    "api_key": "test-key",
+    "timeout": 30,
+    "concurrent_users": 10,
+    "load_duration": 300,
+    "stress_users": 100,
+    "test_images": {
+      "authentic": [
+        "./test_data/authentic/sample1.png",
+        "./test_data/authentic/sample2.png",
+        "./test_data/authentic/sample3.png"
+      ],
+      "fake": [
+        "./test_data/fake/sample1.png",
+        "./test_data/fake/sample2.png",
+        "./test_data/fake/sample3.png"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "single_verification",
+        "path": "/api/v1/verify/screenshot",
+        "method": "POST",
+        "weight": 0.8
+      },
+      {
+        "name": "batch_verification",
+        "path": "/api/v1/verify/batch",
+        "method": "POST",
+        "weight": 0.2
+      }
+    ],
+    "metrics": {
+      "response_time_threshold": 1.0,
+      "success_rate_threshold": 0.95,
+      "error_rate_threshold": 0.05,
+      "throughput_threshold": 100
+    }
+  },
+  "load_test": {
+    "scenarios": [
+      {
+        "name": "normal_load",
+        "users": 50,
+        "duration": 600,
+        "ramp_up_time": 60,
+        "description": "正常负载测试"
+      },
+      {
+        "name": "peak_load",
+        "users": 200,
+        "duration": 300,
+        "ramp_up_time": 30,
+        "description": "峰值负载测试"
+      },
+      {
+        "name": "sustained_load",
+        "users": 100,
+        "duration": 1800,
+        "ramp_up_time": 120,
+        "description": "持续负载测试"
+      }
+    ],
+    "monitoring": {
+      "collect_system_metrics": true,
+      "collect_application_metrics": true,
+      "metrics_interval": 10
+    }
+  },
+  "stress_test": {
+    "max_users": 500,
+    "step_size": 50,
+    "step_duration": 60,
+    "success_rate_threshold": 0.8,
+    "response_time_threshold": 2.0,
+    "abort_on_failure": true
+  },
+  "ab_test": {
+    "variants": [
+      {
+        "name": "control",
+        "weight": 0.5,
+        "description": "当前版本",
+        "model": "efficientnet"
+      },
+      {
+        "name": "treatment_a",
+        "weight": 0.25,
+        "description": "Vision Transformer",
+        "model": "vision_transformer"
+      },
+      {
+        "name": "treatment_b",
+        "weight": 0.25,
+        "description": "Dual Stream Network",
+        "model": "dual_stream"
+      }
+    ],
+    "default_variant": "control",
+    "duration_days": 14,
+    "min_sample_size": 1000,
+    "significance_level": 0.05
+  },
+  "monitoring": {
+    "prometheus": {
+      "enabled": true,
+      "port": 8001,
+      "metrics": [
+        "api_requests_total",
+        "api_request_duration_seconds",
+        "api_active_requests",
+        "model_inference_duration",
+        "model_accuracy"
+      ]
+    },
+    "alerts": {
+      "high_error_rate": {
+        "threshold": 0.1,
+        "duration": "5m",
+        "severity": "warning"
+      },
+      "high_response_time": {
+        "threshold": 1.0,
+        "duration": "5m",
+        "severity": "warning"
+      },
+      "low_success_rate": {
+        "threshold": 0.9,
+        "duration": "5m",
+        "severity": "critical"
+      }
+    }
+  },
+  "reporting": {
+    "output_dir": "./test_reports",
+    "formats": ["json", "html", "pdf"],
+    "include_charts": true,
+    "include_details": true,
+    "email_report": {
+      "enabled": false,
+      "recipients": ["test-team@company.com"],
+      "subject": "Screenshot Verification API Test Report"
+    }
+  }
+}

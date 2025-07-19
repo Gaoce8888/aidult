@@ -1,0 +1,330 @@
+{
+  "feedback_collection": {
+    "enabled": true,
+    "database": {
+      "type": "sqlite",
+      "path": "./data/feedback.db",
+      "backup_enabled": true,
+      "backup_interval_hours": 24
+    },
+    "redis": {
+      "host": "localhost",
+      "port": 6379,
+      "db": 1,
+      "cache_ttl_seconds": 3600
+    },
+    "api_endpoints": {
+      "submit_feedback": "/api/v1/feedback/submit",
+      "get_feedback": "/api/v1/feedback/list",
+      "feedback_stats": "/api/v1/feedback/stats"
+    },
+    "feedback_types": [
+      {
+        "name": "correct",
+        "description": "预测正确",
+        "weight": 1.0
+      },
+      {
+        "name": "incorrect",
+        "description": "预测错误",
+        "weight": 2.0
+      },
+      {
+        "name": "uncertain",
+        "description": "不确定",
+        "weight": 0.5
+      }
+    ],
+    "auto_analysis": {
+      "enabled": true,
+      "interval_hours": 6,
+      "min_feedback_count": 100,
+      "analysis_methods": [
+        "sentiment_analysis",
+        "pattern_detection",
+        "anomaly_detection"
+      ]
+    }
+  },
+  "incremental_learning": {
+    "enabled": true,
+    "model_update": {
+      "min_samples": 100,
+      "max_samples": 1000,
+      "update_frequency_hours": 24,
+      "learning_rate": 1e-5,
+      "batch_size": 16,
+      "epochs_per_update": 5
+    },
+    "data_preprocessing": {
+      "image_size": [224, 224],
+      "augmentation": {
+        "enabled": true,
+        "rotation_range": 10,
+        "width_shift_range": 0.1,
+        "height_shift_range": 0.1,
+        "horizontal_flip": true,
+        "zoom_range": 0.1
+      },
+      "normalization": {
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      }
+    },
+    "model_selection": {
+      "strategy": "ensemble",
+      "ensemble_methods": [
+        "weighted_average",
+        "voting",
+        "stacking"
+      ],
+      "performance_threshold": 0.95
+    },
+    "rollback": {
+      "enabled": true,
+      "max_rollback_versions": 5,
+      "performance_degradation_threshold": 0.05
+    }
+  },
+  "ab_testing": {
+    "enabled": true,
+    "experiments": [
+      {
+        "name": "model_comparison",
+        "description": "比较不同模型的性能",
+        "variants": [
+          {
+            "name": "control",
+            "model": "efficientnet",
+            "weight": 0.4
+          },
+          {
+            "name": "vit",
+            "model": "vision_transformer",
+            "weight": 0.3
+          },
+          {
+            "name": "dual_stream",
+            "model": "dual_stream_network",
+            "weight": 0.3
+          }
+        ],
+        "duration_days": 14,
+        "min_sample_size": 1000,
+        "success_metrics": [
+          "accuracy",
+          "response_time",
+          "user_satisfaction"
+        ]
+      },
+      {
+        "name": "feature_comparison",
+        "description": "比较不同特征提取方法",
+        "variants": [
+          {
+            "name": "baseline",
+            "features": ["traditional", "metadata"],
+            "weight": 0.5
+          },
+          {
+            "name": "enhanced",
+            "features": ["traditional", "metadata", "ai"],
+            "weight": 0.5
+          }
+        ],
+        "duration_days": 7,
+        "min_sample_size": 500
+      }
+    ],
+    "analysis": {
+      "statistical_tests": [
+        "t_test",
+        "chi_square_test",
+        "mann_whitney_test"
+      ],
+      "confidence_level": 0.95,
+      "power_analysis": {
+        "enabled": true,
+        "min_power": 0.8
+      }
+    }
+  },
+  "performance_monitoring": {
+    "enabled": true,
+    "metrics_collection": {
+      "interval_seconds": 60,
+      "retention_days": 30,
+      "aggregation": {
+        "hourly": true,
+        "daily": true,
+        "weekly": true
+      }
+    },
+    "system_metrics": {
+      "cpu": {
+        "enabled": true,
+        "threshold_warning": 70,
+        "threshold_critical": 90
+      },
+      "memory": {
+        "enabled": true,
+        "threshold_warning": 80,
+        "threshold_critical": 95
+      },
+      "disk": {
+        "enabled": true,
+        "threshold_warning": 80,
+        "threshold_critical": 95
+      },
+      "network": {
+        "enabled": true,
+        "monitor_bandwidth": true,
+        "monitor_latency": true
+      }
+    },
+    "application_metrics": {
+      "response_time": {
+        "enabled": true,
+        "percentiles": [50, 90, 95, 99],
+        "threshold_warning": 1.0,
+        "threshold_critical": 2.0
+      },
+      "throughput": {
+        "enabled": true,
+        "unit": "requests_per_second",
+        "threshold_warning": 50,
+        "threshold_critical": 100
+      },
+      "error_rate": {
+        "enabled": true,
+        "threshold_warning": 0.05,
+        "threshold_critical": 0.1
+      },
+      "model_performance": {
+        "enabled": true,
+        "accuracy_threshold": 0.95,
+        "inference_time_threshold": 0.5
+      }
+    },
+    "alerting": {
+      "enabled": true,
+      "channels": [
+        {
+          "type": "email",
+          "recipients": ["ops@company.com", "dev@company.com"],
+          "severity_levels": ["critical", "warning"]
+        },
+        {
+          "type": "slack",
+          "webhook_url": "https://hooks.slack.com/services/xxx/yyy/zzz",
+          "severity_levels": ["critical"]
+        },
+        {
+          "type": "pagerduty",
+          "service_key": "pagerduty_service_key",
+          "severity_levels": ["critical"]
+        }
+      ],
+      "escalation": {
+        "enabled": true,
+        "levels": [
+          {
+            "level": 1,
+            "delay_minutes": 5,
+            "recipients": ["oncall@company.com"]
+          },
+          {
+            "level": 2,
+            "delay_minutes": 15,
+            "recipients": ["manager@company.com"]
+          }
+        ]
+      }
+    }
+  },
+  "anomaly_detection": {
+    "enabled": true,
+    "methods": [
+      {
+        "name": "statistical",
+        "algorithm": "z_score",
+        "threshold": 3.0,
+        "window_size": 100
+      },
+      {
+        "name": "isolation_forest",
+        "algorithm": "isolation_forest",
+        "contamination": 0.1,
+        "n_estimators": 100
+      },
+      {
+        "name": "autoencoder",
+        "algorithm": "autoencoder",
+        "threshold": 0.95,
+        "model_path": "./models/anomaly_detector.pth"
+      }
+    ],
+    "features": [
+      "response_time",
+      "error_rate",
+      "cpu_usage",
+      "memory_usage",
+      "request_count"
+    ],
+    "alerting": {
+      "enabled": true,
+      "min_anomaly_score": 0.8,
+      "cooldown_minutes": 30
+    }
+  },
+  "reporting": {
+    "enabled": true,
+    "schedules": [
+      {
+        "name": "daily_summary",
+        "cron": "0 9 * * *",
+        "recipients": ["team@company.com"],
+        "template": "daily_summary.html"
+      },
+      {
+        "name": "weekly_analysis",
+        "cron": "0 10 * * 1",
+        "recipients": ["management@company.com"],
+        "template": "weekly_analysis.html"
+      },
+      {
+        "name": "monthly_report",
+        "cron": "0 11 1 * *",
+        "recipients": ["stakeholders@company.com"],
+        "template": "monthly_report.html"
+      }
+    ],
+    "templates": {
+      "daily_summary": {
+        "sections": [
+          "performance_metrics",
+          "error_summary",
+          "feedback_summary",
+          "anomaly_alerts"
+        ]
+      },
+      "weekly_analysis": {
+        "sections": [
+          "trend_analysis",
+          "ab_test_results",
+          "model_performance",
+          "improvement_recommendations"
+        ]
+      },
+      "monthly_report": {
+        "sections": [
+          "executive_summary",
+          "detailed_metrics",
+          "cost_analysis",
+          "roadmap"
+        ]
+      }
+    },
+    "export_formats": ["pdf", "html", "json", "csv"]
+  }
+}

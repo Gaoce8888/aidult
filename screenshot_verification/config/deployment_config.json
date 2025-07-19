@@ -1,0 +1,321 @@
+{
+  "environments": {
+    "development": {
+      "api": {
+        "host": "localhost",
+        "port": 8000,
+        "workers": 1,
+        "reload": true,
+        "log_level": "debug"
+      },
+      "database": {
+        "type": "sqlite",
+        "path": "./data/development.db"
+      },
+      "redis": {
+        "host": "localhost",
+        "port": 6379,
+        "db": 0
+      },
+      "models": {
+        "cache_dir": "./models/cache",
+        "default_model": "efficientnet",
+        "model_paths": {
+          "efficientnet": "./models/efficientnet_best.pth",
+          "vision_transformer": "./models/vit_best.pth",
+          "dual_stream": "./models/dual_stream_best.pth"
+        }
+      },
+      "security": {
+        "api_key_required": false,
+        "rate_limit": {
+          "requests_per_minute": 1000,
+          "burst_size": 100
+        }
+      },
+      "monitoring": {
+        "enabled": false,
+        "prometheus_port": 8001,
+        "log_level": "debug"
+      }
+    },
+    "testing": {
+      "api": {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "workers": 2,
+        "reload": false,
+        "log_level": "info"
+      },
+      "database": {
+        "type": "sqlite",
+        "path": "./data/testing.db"
+      },
+      "redis": {
+        "host": "localhost",
+        "port": 6379,
+        "db": 1
+      },
+      "models": {
+        "cache_dir": "./models/cache",
+        "default_model": "efficientnet",
+        "model_paths": {
+          "efficientnet": "./models/efficientnet_best.pth",
+          "vision_transformer": "./models/vit_best.pth",
+          "dual_stream": "./models/dual_stream_best.pth"
+        }
+      },
+      "security": {
+        "api_key_required": true,
+        "rate_limit": {
+          "requests_per_minute": 500,
+          "burst_size": 50
+        }
+      },
+      "monitoring": {
+        "enabled": true,
+        "prometheus_port": 8001,
+        "log_level": "info"
+      }
+    },
+    "production": {
+      "api": {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "workers": 4,
+        "reload": false,
+        "log_level": "warning"
+      },
+      "database": {
+        "type": "postgresql",
+        "host": "postgres-db",
+        "port": 5432,
+        "database": "screenshot_verification",
+        "username": "verification_user",
+        "password": "secure_password"
+      },
+      "redis": {
+        "host": "redis-cache",
+        "port": 6379,
+        "db": 0,
+        "password": "redis_password"
+      },
+      "models": {
+        "cache_dir": "/app/models/cache",
+        "default_model": "ensemble",
+        "model_paths": {
+          "efficientnet": "/app/models/efficientnet_best.pth",
+          "vision_transformer": "/app/models/vit_best.pth",
+          "dual_stream": "/app/models/dual_stream_best.pth",
+          "ensemble": "/app/models/ensemble_best.pth"
+        }
+      },
+      "security": {
+        "api_key_required": true,
+        "rate_limit": {
+          "requests_per_minute": 200,
+          "burst_size": 20
+        },
+        "ssl": {
+          "enabled": true,
+          "cert_path": "/etc/ssl/certs/verification.crt",
+          "key_path": "/etc/ssl/private/verification.key"
+        }
+      },
+      "monitoring": {
+        "enabled": true,
+        "prometheus_port": 8001,
+        "log_level": "warning",
+        "alerting": {
+          "enabled": true,
+          "slack_webhook": "https://hooks.slack.com/services/xxx/yyy/zzz",
+          "email": {
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": 587,
+            "username": "alerts@company.com",
+            "password": "email_password"
+          }
+        }
+      },
+      "scaling": {
+        "auto_scaling": true,
+        "min_replicas": 2,
+        "max_replicas": 10,
+        "cpu_threshold": 70,
+        "memory_threshold": 80
+      }
+    }
+  },
+  "docker": {
+    "image_name": "screenshot-verification",
+    "image_tag": "latest",
+    "registry": {
+      "url": "registry.company.com",
+      "username": "docker_user",
+      "password": "docker_password"
+    },
+    "build": {
+      "context": ".",
+      "dockerfile": "Dockerfile",
+      "build_args": {
+        "PYTHON_VERSION": "3.9",
+        "TORCH_VERSION": "1.12.0"
+      }
+    }
+  },
+  "kubernetes": {
+    "enabled": true,
+    "namespace": "screenshot-verification",
+    "deployment": {
+      "name": "screenshot-verification-api",
+      "replicas": 3,
+      "resources": {
+        "requests": {
+          "cpu": "500m",
+          "memory": "1Gi"
+        },
+        "limits": {
+          "cpu": "2000m",
+          "memory": "4Gi"
+        }
+      },
+      "liveness_probe": {
+        "path": "/api/v1/health",
+        "port": 8000,
+        "initial_delay_seconds": 30,
+        "period_seconds": 10
+      },
+      "readiness_probe": {
+        "path": "/api/v1/health",
+        "port": 8000,
+        "initial_delay_seconds": 5,
+        "period_seconds": 5
+      }
+    },
+    "service": {
+      "name": "screenshot-verification-service",
+      "type": "LoadBalancer",
+      "port": 80,
+      "target_port": 8000
+    },
+    "ingress": {
+      "enabled": true,
+      "host": "api.verification.company.com",
+      "tls": {
+        "enabled": true,
+        "secret_name": "verification-tls"
+      }
+    },
+    "configmap": {
+      "name": "verification-config",
+      "data": {
+        "environment": "production",
+        "log_level": "warning"
+      }
+    },
+    "secrets": {
+      "name": "verification-secrets",
+      "data": {
+        "api_keys": "base64_encoded_api_keys",
+        "database_password": "base64_encoded_db_password",
+        "redis_password": "base64_encoded_redis_password"
+      }
+    }
+  },
+  "monitoring": {
+    "prometheus": {
+      "enabled": true,
+      "scrape_interval": "15s",
+      "retention_days": 30
+    },
+    "grafana": {
+      "enabled": true,
+      "admin_password": "grafana_password",
+      "dashboards": [
+        {
+          "name": "API Performance",
+          "file": "dashboards/api_performance.json"
+        },
+        {
+          "name": "Model Performance",
+          "file": "dashboards/model_performance.json"
+        }
+      ]
+    },
+    "alertmanager": {
+      "enabled": true,
+      "config": {
+        "global": {
+          "smtp_smarthost": "smtp.gmail.com:587",
+          "smtp_from": "alerts@company.com"
+        },
+        "route": {
+          "group_by": ["alertname"],
+          "group_wait": "10s",
+          "group_interval": "10s",
+          "repeat_interval": "1h",
+          "receiver": "web.hook"
+        },
+        "receivers": [
+          {
+            "name": "web.hook",
+            "webhook_configs": [
+              {
+                "url": "https://hooks.slack.com/services/xxx/yyy/zzz"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "backup": {
+    "enabled": true,
+    "schedule": "0 2 * * *",  // 每天凌晨2点
+    "retention_days": 30,
+    "storage": {
+      "type": "s3",
+      "bucket": "verification-backups",
+      "region": "us-west-2"
+    },
+    "databases": [
+      {
+        "name": "postgresql",
+        "type": "postgresql",
+        "host": "postgres-db",
+        "database": "screenshot_verification"
+      }
+    ]
+  },
+  "security": {
+    "network": {
+      "allowed_ips": [
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16"
+      ],
+      "firewall_rules": [
+        {
+          "port": 8000,
+          "protocol": "tcp",
+          "source": "0.0.0.0/0"
+        }
+      ]
+    },
+    "ssl": {
+      "certificate_authority": "Let's Encrypt",
+      "auto_renewal": true,
+      "renewal_threshold_days": 30
+    },
+    "encryption": {
+      "at_rest": {
+        "enabled": true,
+        "algorithm": "AES-256"
+      },
+      "in_transit": {
+        "enabled": true,
+        "protocols": ["TLS 1.2", "TLS 1.3"]
+      }
+    }
+  }
+}
