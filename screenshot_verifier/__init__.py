@@ -1,0 +1,1 @@
+"""Screenshot Verifier root package."""
