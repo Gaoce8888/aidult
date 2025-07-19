@@ -1,0 +1,154 @@
+{
+  "model_configs": {
+    "efficientnet": {
+      "type": "efficientnet",
+      "num_classes": 2,
+      "img_size": 224,
+      "learning_rate": 1e-4,
+      "batch_size": 32,
+      "num_epochs": 100,
+      "optimizer": "adamw",
+      "scheduler": "cosine",
+      "weight_decay": 1e-4,
+      "dropout": 0.3
+    },
+    "vision_transformer": {
+      "type": "vision_transformer",
+      "num_classes": 2,
+      "img_size": 224,
+      "patch_size": 16,
+      "embed_dim": 768,
+      "depth": 12,
+      "num_heads": 12,
+      "mlp_ratio": 4.0,
+      "dropout": 0.1,
+      "learning_rate": 5e-5,
+      "batch_size": 16,
+      "num_epochs": 150,
+      "optimizer": "adamw",
+      "scheduler": "cosine",
+      "weight_decay": 1e-4
+    },
+    "dual_stream": {
+      "type": "dual_stream",
+      "num_classes": 2,
+      "img_size": 224,
+      "learning_rate": 1e-4,
+      "batch_size": 24,
+      "num_epochs": 120,
+      "optimizer": "adamw",
+      "scheduler": "cosine",
+      "weight_decay": 1e-4,
+      "fusion_dropout": 0.5
+    },
+    "ensemble": {
+      "type": "ensemble",
+      "ensemble_configs": [
+        {
+          "type": "efficientnet",
+          "num_classes": 2,
+          "weight": 0.4
+        },
+        {
+          "type": "vision_transformer",
+          "num_classes": 2,
+          "weight": 0.3
+        },
+        {
+          "type": "dual_stream",
+          "num_classes": 2,
+          "weight": 0.3
+        }
+      ],
+      "img_size": 224,
+      "learning_rate": 1e-4,
+      "batch_size": 16,
+      "num_epochs": 100,
+      "optimizer": "adamw",
+      "scheduler": "cosine"
+    }
+  },
+  "data_augmentation": {
+    "train": {
+      "horizontal_flip": 0.5,
+      "vertical_flip": 0.1,
+      "random_rotate": 0.3,
+      "shift_scale_rotate": {
+        "shift_limit": 0.1,
+        "scale_limit": 0.1,
+        "rotate_limit": 15,
+        "probability": 0.5
+      },
+      "noise": {
+        "gauss_noise": {"var_limit": [10.0, 50.0]},
+        "gaussian_blur": {"blur_limit": 3},
+        "motion_blur": {"blur_limit": 3},
+        "probability": 0.3
+      },
+      "color": {
+        "brightness_contrast": {"brightness_limit": 0.2, "contrast_limit": 0.2},
+        "hue_saturation": {"hue_shift_limit": 20, "sat_shift_limit": 30, "val_shift_limit": 20},
+        "probability": 0.3
+      }
+    },
+    "validation": {
+      "resize_only": true
+    }
+  },
+  "training": {
+    "num_workers": 4,
+    "pin_memory": true,
+    "log_interval": 100,
+    "save_interval": 10,
+    "early_stopping": {
+      "patience": 20,
+      "min_delta": 0.001
+    },
+    "mixed_precision": true,
+    "gradient_clipping": 1.0
+  },
+  "evaluation": {
+    "metrics": ["accuracy", "precision", "recall", "f1", "auc"],
+    "confusion_matrix": true,
+    "roc_curve": true,
+    "precision_recall_curve": true
+  },
+  "paths": {
+    "data_dir": "./data/screenshots",
+    "output_dir": "./outputs",
+    "checkpoint_dir": "./outputs/checkpoints",
+    "log_dir": "./outputs/logs",
+    "tensorboard_dir": "./outputs/tensorboard",
+    "model_save_dir": "./models"
+  },
+  "hyperparameter_tuning": {
+    "enabled": false,
+    "method": "optuna",
+    "n_trials": 50,
+    "search_space": {
+      "learning_rate": {"type": "log_uniform", "low": 1e-5, "high": 1e-3},
+      "batch_size": {"type": "categorical", "choices": [16, 32, 64]},
+      "dropout": {"type": "uniform", "low": 0.1, "high": 0.5},
+      "weight_decay": {"type": "log_uniform", "low": 1e-5, "high": 1e-3}
+    }
+  },
+  "adversarial_training": {
+    "enabled": false,
+    "epsilon": 0.03,
+    "alpha": 0.01,
+    "iterations": 10,
+    "random_start": true
+  },
+  "distributed_training": {
+    "enabled": false,
+    "backend": "nccl",
+    "world_size": 4,
+    "rank": 0
+  },
+  "model_interpretability": {
+    "enabled": true,
+    "grad_cam": true,
+    "attention_visualization": true,
+    "feature_importance": true
+  }
+}
